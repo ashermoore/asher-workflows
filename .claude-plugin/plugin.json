@@ -1,0 +1,10 @@
+{
+  "name": "asher-workflows",
+  "version": "1.0.0",
+  "description": "Project vault system with persistent context, persona-based agents, and workflow commands",
+  "author": {
+    "name": "Asher Moore"
+  },
+  "license": "UNLICENSED",
+  "skills": "./skills/"
+}

@@ -1,0 +1,12 @@
+{
+  "description": "Asher Workflows - vault-based project management",
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "test -d .claude/vault && echo 'Project vault detected at .claude/vault/. Run /asher-workflows:resume to load project context.' || true",
+        "timeout": 3
+      }
+    ]
+  }
+}

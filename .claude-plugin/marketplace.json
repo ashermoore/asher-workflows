@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "asher-workflows",
+  "description": "Project vault system with persistent context, persona-based agents, and workflow commands for managing software projects across sessions",
+  "owner": {
+    "name": "Asher Moore"
+  },
+  "plugins": [
+    {
+      "name": "asher-workflows",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "productivity",
+      "tags": ["vault", "project-management", "workflows", "personas"]
+    }
+  ],
+  "version": "1.0.0"
+}
