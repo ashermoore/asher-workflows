@@ -24,6 +24,8 @@ This runbook covers the cutover for the Q2 product launch...
 
 If you genuinely need a subtitle (like a status tag or a one-line summary), use a panel or a short italic line, not an H1.
 
+Watch for genre-word duplication too. Confluence page titles often carry a genre word ("Runbook", "RFC", "Problem Statement", "Postmortem", "Design Doc", "Proposal", "TL;DR"). Do not repeat that word as your opening heading. If the title is "2026-Q2 Launch Runbook", the first heading is not `## Runbook`, it is `## Background` or `## Rollout plan`. If the title is "Problem Statement: Envoy Timeouts", the first heading is not `## Problem Statement`, it is `## Incident Timeline` or `## Context`. The genre word already sits in the page title, the breadcrumb, and the sidebar; echoing it in the body outline wastes the first line of real estate and signals a draft that was not re-read end-to-end.
+
 ## 2. No horizontal rules
 
 `---`, `***`, and `<hr>` render as thin grey lines in Confluence. They add visual noise and fragment the page without providing structure that the reader can navigate.
@@ -49,6 +51,8 @@ More content.
 ```
 
 ## 3. No em dashes
+
+You will produce em dashes by default. The character is statistically common in your training data and slips into prose even when you believe you have avoided it. The rule is not "try not to use em dashes", it is "before publishing, grep the draft for U+2014 and rewrite every match." If you skip the grep, you will ship em dashes. Treat every first draft as if it contains several until you have proven otherwise.
 
 The em dash character (Unicode U+2014, written as `\u2014`) looks elegant in prose but is often a symptom of a sentence trying to do two things. Replace with a comma, colon, full stop, or parentheses, or rewrite.
 
@@ -137,6 +141,18 @@ After drafting, read the page top to bottom in one pass. For each paragraph, ask
 - "As mentioned above, ..." constructions
 
 A good page says each thing exactly once, in the most natural place, with enough context that the reader does not need the reminder.
+
+### Structural check for documents with a TL;DR
+
+If your page opens with a TL;DR, summary, abstract, or "in short" block, the sections below it must *extend* the TL;DR, not restate it. The common failure mode on incident writeups and problem statements looks like:
+
+1. TL;DR says "The cause is A plus B. The blast radius is C."
+2. The "Problem Statement" section below says "The cause is A plus B, with a bit more detail. The blast radius is C."
+3. A later "Structural Gaps" or "Summary" or "Key Takeaways" section says "Two gaps compounded: A and B."
+
+The reader encounters the same claim three times and loses trust that each section has something new to offer. Before publishing, read the TL;DR, then scan each section heading and ask one question: "Is this section the TL;DR again?" If yes, cut the section or cut the TL;DR. Usually cutting the TL;DR (or collapsing it to one sentence) is easier than rewriting every downstream section.
+
+A page with a TL;DR has struck the right balance when a reader can stop after the TL;DR and have the headline, continue to the sections for the detail the TL;DR deliberately omitted, and never feel like any later section is re-reading them the opening.
 
 ## 8. Logical flow
 

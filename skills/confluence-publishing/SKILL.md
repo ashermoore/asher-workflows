@@ -59,9 +59,10 @@ Use this confirmation as your chance to flag anything that looks like a manual e
    - Audience (who reads this, and what they need to do after reading)
    - Whether this supersedes an existing page
 2. **Draft the body in Markdown**, following the house style checklist below.
-3. **Preview with the user.** Paste the full draft body into the chat inside a fenced ```` ```markdown ```` block so they can read it as it will render, alongside a short three-to-five-line outline of the section structure ("Purpose, Context, Rollout plan, Owners, Action required"). Call out any placeholders, guessed @mentions, or unconfirmed facts explicitly. Ask: "Happy for me to publish this as-is, or anything to change?" Wait for approval.
-4. **Publish** with `createConfluencePage`. Capture the returned URL and share it.
-5. **Post-publish sanity check.** Re-read the page with `getConfluencePage` and confirm panels rendered, @mentions resolved, and code blocks did not get mangled. Fix with a follow-up `updateConfluencePage` if needed.
+3. **Run the pre-publish verification.** Before showing the draft to the user or calling any write tool, paste the verification block (see "Pre-publish verification" below) into chat and fix every violation. The house style checklist is advice until you produce the verification block, at which point it becomes a gate. Do not skip this step because "the checklist is in the prompt", the point is to force the checks into visible output so you cannot self-attest your way past them.
+4. **Preview with the user.** Paste the full draft body into the chat inside a fenced ```` ```markdown ```` block so they can read it as it will render, alongside a short three-to-five-line outline of the section structure ("Purpose, Context, Rollout plan, Owners, Action required"). Call out any placeholders, guessed @mentions, or unconfirmed facts explicitly. Ask: "Happy for me to publish this as-is, or anything to change?" Wait for approval.
+5. **Publish** with `createConfluencePage`. Capture the returned URL and share it.
+6. **Post-publish sanity check.** Re-read the page with `getConfluencePage` and confirm panels rendered, @mentions resolved, and code blocks did not get mangled. Fix with a follow-up `updateConfluencePage` if needed.
 
 ## Workflow 2: Edit an existing page
 
@@ -71,8 +72,9 @@ This is the highest-risk workflow. The user may have typed something directly in
 2. **Diff in your head.** What is on the page? What did the user ask you to change? Everything else stays.
 3. **Preserve inline-commented ranges.** If an inline comment is anchored to a sentence, avoid rewriting that sentence unless the user specifically asked you to. If you must rewrite it, plan to leave a footer comment explaining what happened to the anchor.
 4. **Show the plan.** Present a short table to the user with three columns: section, what's there now, what you'll do (keep verbatim, replace with X, add new section Y, etc.). Below the table, list any inline comments whose anchor text will change and any comments you will reply to. Get approval before writing.
-5. **Update** with `updateConfluencePage`, passing the current `version.number` plus 1. The whole body is replaced on every update, so the body you send must include the parts you intend to keep, verbatim.
-6. **Verify.** Re-read the page. Confirm nothing important was dropped and formatting still renders.
+5. **Run the pre-publish verification** on the final body you are about to send (see "Pre-publish verification" below). Paste the verification block into chat and fix every violation before the write, including on sections you are keeping verbatim (they may already contain house-style violations you now own by republishing).
+6. **Update** with `updateConfluencePage`, passing the current `version.number` plus 1. The whole body is replaced on every update, so the body you send must include the parts you intend to keep, verbatim.
+7. **Verify.** Re-read the page. Confirm nothing important was dropped and formatting still renders.
 
 ### Trivial-edit carve-out
 
@@ -108,11 +110,11 @@ See `references/comments-workflow.md` for reply templates and worked examples.
 
 Run through this list *before every* `createConfluencePage` and `updateConfluencePage` call. It exists because these mistakes keep happening and each one erodes the page's credibility.
 
-**No title repeat.** Confluence renders the title at the top of the page already. Do not start the body with `# <Title>` or a heading that duplicates it. Start with the first section of real content.
+**No title repeat.** Confluence renders the title at the top of the page already. Do not start the body with `# <Title>` or a heading that duplicates it. If the page title contains genre words such as "Problem Statement", "Runbook", "RFC", "Postmortem", "Design Doc", "Proposal", or "TL;DR", the first body heading must not be that same word either, using the genre word as your opening heading duplicates the title in the outline and in the sidebar. Start with the first section of real content ("Background", "Incident Timeline", "Context", and so on).
 
 **No horizontal rules.** Do not use `---`, `***`, or `<hr>` to separate sections. Use headings (`##`, `###`) and whitespace. Horizontal rules render as thin lines in Confluence and add visual noise without structure.
 
-**No em dashes.** Replace the em dash character (`\u2014`, the long dash) with a comma, a colon, a full stop, or restructure the sentence. En dashes (`\u2013`) for number ranges are fine. Hyphens (`-`) in compound words are fine. This rule is about the long dash specifically.
+**No em dashes.** You will produce em dashes by default, assume every first draft has several. The rule is not "try not to use em dashes", it is "before publishing, grep the draft for the em dash character (`\u2014`, the long dash) and rewrite every hit." Replace each with a comma, colon, full stop, parentheses, or a sentence split. En dashes (`\u2013`) for number ranges are fine. Hyphens (`-`) in compound words are fine. This rule is about the long dash specifically. Skipping the grep is how em dashes get shipped, the rule alone does not prevent them.
 
 **British English.** Default to British spellings: _organise, organised, organisation, colour, behaviour, flavour, favour, realise, recognise, prioritise, analyse, optimise, centre, theatre, metre, litre, grey, travelled, cancelled, licence (noun), practise (verb), defence._ Run a search for common American forms (`-ize`, `-ization`, `color`, `behavior`, `center`, `analyze`, `optimize`, `gray`) before publishing.
 
@@ -120,7 +122,7 @@ Run through this list *before every* `createConfluencePage` and `updateConfluenc
 
 **Visual callouts.** Use Confluence info / note / warning / success panels to draw attention to important caveats, next steps, or dependencies. A wall of plain prose is hard to scan. Reach for a panel whenever you catch yourself writing "Note that…", "Be aware…", "Important:…", or "Action required:".
 
-**No repetition.** Read the full page top to bottom before publishing. If a point is made twice, cut one copy. If the conclusion restates the introduction, trim it to a one-line summary or cut it entirely.
+**No repetition.** Read the full page top to bottom before publishing. If a point is made twice, cut one copy. If the conclusion restates the introduction, trim it to a one-line summary or cut it entirely. Structural check: if the page has a TL;DR, the sections after it must *extend* the TL;DR, not restate it. After drafting, read the TL;DR, then read each section heading and ask whether that section is "the TL;DR again with more words". If yes, cut either the section or the TL;DR. The most common failure is a TL;DR followed by a "Problem Statement" or "Summary" section saying the same thing with slightly different phrasing, followed by a third recap in a "Structural Gaps" or similar block, the reader sees the same claim three times and loses trust that each section carries something new.
 
 **Logical flow.** A reader who knows nothing about the topic should follow the page top-to-bottom without jumping back. Lead with context (why this exists), then the substance, then the calls to action. If you catch yourself writing "as mentioned above", the structure is probably wrong, consolidate the point in one place.
 
@@ -129,6 +131,36 @@ Run through this list *before every* `createConfluencePage` and `updateConfluenc
 **Respect manual edits.** The user may have typed directly into Confluence. Never silently overwrite content you did not produce. When the plan would replace text you did not write, flag it and ask.
 
 The full checklist with worked "before/after" examples lives in `references/style-checklist.md`. Read it any time you are unsure.
+
+## Pre-publish verification
+
+The house style checklist is advice until you produce a verification block. Before every `createConfluencePage` or `updateConfluencePage` call (including the trivial-edit carve-out, the fields are small but still run them), paste a block like the one below into chat. Fill it in honestly against the actual draft body. If any field fails, fix the draft and regenerate the block. Only call the write tool after a clean block.
+
+```
+Pre-publish verification
+- Em dash count (U+2014): <n>
+  - If n > 0, list each occurrence with 3 to 5 words of surrounding context and the rewrite.
+- American spellings: grep for `ize\b`, `ization`, `color`, `behavior`, `center`, `gray`, `analyze`.
+  - List hits with the British replacement, or state "none".
+- Title repeat: page title is "<title>". First body heading is "<heading>". Heading is not a substring of the title and is not a genre word carried over from the title (Runbook, RFC, Problem Statement, Postmortem, Design Doc, Proposal, TL;DR). [pass/fail]
+- Repetition: list each section heading, then one clause summarising what that section actually adds. If any two summaries say the same thing, name the pair and state which one to cut.
+- Panels: <n> panels used (types: info/note/warning/success/error). Zero panels on a page with a TL;DR, a "Constraints" section, or sentences of the form "must", "cannot", "do not" is a smell, justify or add one. More than three panels on a page dilutes signal.
+- @ mentions: every owner, author, and reviewer slot is a real Confluence mention, not plain text, and no "TBD" or empty slot survives the draft. [pass/fail, list the holdouts]
+- Horizontal rules: zero `---`, `***`, `<hr>` outside fenced code. [pass/fail]
+```
+
+The block is not ceremony, it is the forcing function. The reason the checklist alone does not work is that self-attestation ("I ran the checklist") is easy to fake to yourself. A written block with named hits is not.
+
+### Author and reviewer separation
+
+For pages over roughly 300 words, incident writeups, problem statements, RFCs, postmortems, or any page the user has flagged as high-stakes, do not self-approve in the same context. After your own verification block:
+
+1. Spawn a `code-reviewer` or `verifier` subagent with the draft body, the page title, and a pointer to `style-checklist.md`.
+2. The reviewer reports violations against the checklist (em dashes, American spellings, title repeats, repetition, missing panels, broken mentions).
+3. Apply the fixes.
+4. Then preview with the user and publish.
+
+The author's eye glides over what the author was inclined to write. A second pass in a separate lane catches what the first pass could not. The cost of one extra subagent is much smaller than the cost of republishing after someone spots em dashes in the first comment.
 
 ## Common pitfalls
 
